@@ -214,7 +214,7 @@ public class GwtSampleProject implements EntryPoint {
     gpConfirmButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        final String[] buttonsArray= new String[]{"Nope", "Yeah"};
+        final String[] buttonsArray= new String[]{"Yeah", "Nope"};
         phoneGap.getNotification().confirm("Are you confirming this?",
           new ConfirmCallback() {
             @Override
@@ -237,6 +237,7 @@ public class GwtSampleProject implements EntryPoint {
     jsniVibrateButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
+        JsniNotification.beep(1);
         JsniNotification.vibrate(2209);
       }
     });
@@ -257,10 +258,10 @@ public class GwtSampleProject implements EntryPoint {
     DOM.getElementById("phonelink").setAttribute("href", "tel:555-5555");
 
     DOM.getElementById("smslink").setAttribute("href",
-      "sms:555-5555?body=This is a SMS just for you!");
+      "sms:555-5555?body=Some SMS text...!");
 
     DOM.getElementById("maillink").setAttribute("href",
-      "mailto:someone@server.com?subject=Great idea!&body=I think that...");
+      "mailto:someone@server.com?subject=An email!&body=Some email text...");
 
     /*
      * Set handlers for the Android "Back" button (through JSNI) and for the
