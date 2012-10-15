@@ -1,0 +1,2 @@
+serviceClass: com.kereki.gwtsampleproject.client.GetWorldTimeService
+path: 30281CCFA62DE6A207B3E84DD43D3B2D.gwt.rpc
