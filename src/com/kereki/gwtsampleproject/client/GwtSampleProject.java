@@ -56,14 +56,14 @@ public class GwtSampleProject implements EntryPoint {
     /*
      * Adjust the RPC service if needed
      */
-    // adjustRpcService((ServiceDefTarget) worldTimeProxy);
-
     if (GWT.getHostPageBaseURL().startsWith("file://")) {
       final String newUrl= GWT.getModuleBaseURL().replace("file:///android_asset/www",
         MY_HOST + ":8080" + MY_PATH);
+
       ((ServiceDefTarget) timeProxy).setServiceEntryPoint(newUrl
         + ((ServiceDefTarget) timeProxy).getServiceEntryPoint().replace(
           GWT.getModuleBaseURL(), ""));
+
       ((ServiceDefTarget) timeProxy).setRpcRequestBuilder(new RpcRequestBuilder() {
         @Override
         protected void doFinish(RequestBuilder rb) {

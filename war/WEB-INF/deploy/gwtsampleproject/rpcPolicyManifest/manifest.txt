@@ -1,6 +1,2 @@
 # Module gwtsampleproject
 # RPC service class, partial path of RPC policy file
-com.google.gwt.logging.shared.RemoteLoggingService, 67A46E45D6556EA926DCB271EF2B5160.gwt.rpc
-com.googlecode.gwtphonegap.client.file.browser.service.FileRemoteService, 08ED290A8A1BA34B7BB9E2F7392DD0D4.gwt.rpc
-com.kereki.gwtsampleproject.client.GetWorldTimeService, 30281CCFA62DE6A207B3E84DD43D3B2D.gwt.rpc
-com.googlecode.gwtphonegap.client.log.shared.PhoneGapLogService, 6B7201FC72BDC243A13892FD0E60BB85.gwt.rpc

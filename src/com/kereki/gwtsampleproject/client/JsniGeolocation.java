@@ -1,8 +1,8 @@
 package com.kereki.gwtsampleproject.client;
 
 public class JsniGeolocation {
-    static native void getCurrentPosition(JsniGeolocationCallback callback)
-    /*-{
+  static native void getCurrentPosition(JsniGeolocationCallback callback)
+  /*-{
 		navigator.geolocation
 				.getCurrentPosition(
 						function(position) {
@@ -18,6 +18,5 @@ public class JsniGeolocation {
 							timeout : 10000,
 							enableHighAccuracy : true
 						});
-
-    }-*/;
+  }-*/;
 }

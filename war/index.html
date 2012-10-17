@@ -2,15 +2,22 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    
+    <!-- The following line avoids screen resizing -->
     <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+    
     <link type="text/css" rel="stylesheet" href="GwtSampleProject.css">
+
     <title>Sample GWT/Phonegap Application</title>
-    <script type="text/javascript" charset="utf-8" src="phonegap.js"></script>
-    <script type="text/javascript" language="javascript" src="gwtsampleproject/gwtsampleproject.nocache.js"></script>
+
+	<!-- The PhoneGap script goes first, GWT's own goes last. -->
+    <script type="text/javascript" src="phonegap.js"></script>
+    <script src="gwtsampleproject/gwtsampleproject.nocache.js"></script>
   </head>
 
   <body>
-    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
+    <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' 
+    style="position:absolute;width:0;height:0;border:0"></iframe>
 
     <h1>GWT Sample Project</h1>
     
@@ -21,10 +28,10 @@
 	<li><span id="getTimeJsonContainer"></span></li>
 	<li><span id="getPositionJsniContainer"></span></li>
 	<li><span id="getPositionGpContainer"></span></li>
-	<li><span id="stdConfirmContainer"></span></li>
-	<li><span id="gpConfirmContainer"></span></li>
 	<li><span id="jsniWarningContainer"></span></li>
 	<li><span id="gpWarningContainer"></span></li>
+	<li><span id="stdConfirmContainer"></span></li>
+	<li><span id="gpConfirmContainer"></span></li>
 	
 	</ul>
 	
@@ -33,5 +40,8 @@
 	<li><a id="smslink">Text me!</a></li>
 	<li><a id="maillink">Email me!</a></li>
 	</ul>
+
+
+<a href="https://www.google.com/calendar/ical/fkereki%40gmail.com/public/basic.ics">calendar</a>
   </body>
 </html>
