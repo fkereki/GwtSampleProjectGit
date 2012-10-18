@@ -12,17 +12,17 @@ public class JsniPositionCoords extends JavaScriptObject {
    */
   public final native double getLatitude()
   /*-{
-		return this.latitude;
+    return this.latitude;
   }-*/;
 
   public final native double getLongitude()
   /*-{
-		return this.longitude;
+    return this.longitude;
   }-*/;
 
   public final native double getAccuracy()
   /*-{
-		return this.accuracy;
+    return this.accuracy;
   }-*/;
 
 }

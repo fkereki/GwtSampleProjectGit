@@ -31,30 +31,41 @@ public class GwtSampleProject implements EntryPoint {
   static final String MY_HOST= "http://192.168.1.200";
   static final String MY_PATH= "/GwtSampleProject";
 
-  public void adjustRpcService(ServiceDefTarget service) {
-    if (GWT.getHostPageBaseURL().startsWith("file://")) {
-      final String newModuleUrl= GWT.getModuleBaseURL().replace(
-        "file:///android_asset/www", MY_HOST + ":8080" + MY_PATH);
-      final String newService= service.getServiceEntryPoint().replace(
-        GWT.getModuleBaseURL(), "");
-      service.setServiceEntryPoint(newModuleUrl + newService);
-      service.setRpcRequestBuilder(new RpcRequestBuilder() {
-        @Override
-        protected void doFinish(RequestBuilder rb) {
-          super.doFinish(rb);
-          rb.setHeader(MODULE_BASE_HEADER, newModuleUrl);
-        }
-      });
-    }
-  }
-
   // Remote service proxy to talk to the server-side actual service.
   private final GetWorldTimeServiceAsync timeProxy= GWT.create(GetWorldTimeService.class);
+
+  // Set up PhoneGap
+  private final PhoneGap phoneGap= GWT.create(PhoneGap.class);
 
   @Override
   public void onModuleLoad() {
     /*
-     * Adjust the RPC service if needed
+     * Configure PhoneGap
+     */
+    phoneGap.addHandler(new PhoneGapAvailableHandler() {
+      @Override
+      public void onPhoneGapAvailable(PhoneGapAvailableEvent event) {
+        // PhoneGap is ready!
+        finishOnLoad();
+      }
+    });
+
+    phoneGap.addHandler(new PhoneGapTimeoutHandler() {
+      @Override
+      public void onPhoneGapTimeout(PhoneGapTimeoutEvent event) {
+        // PhoneGap won't work; alert the user, crash the app, whatever...
+      }
+    });
+
+    phoneGap.initializePhoneGap();
+  }
+
+  /*
+   * PhoneGap is ready; finish setting everything up
+   */
+  void finishOnLoad() {
+    /*
+     * Adjust the RPC service if running on the smartphone
      */
     if (GWT.getHostPageBaseURL().startsWith("file://")) {
       final String newUrl= GWT.getModuleBaseURL().replace("file:///android_asset/www",
@@ -74,27 +85,7 @@ public class GwtSampleProject implements EntryPoint {
     }
 
     /*
-     * Set GWT-PhoneGap up
-     */
-    final PhoneGap phoneGap= GWT.create(PhoneGap.class);
-    phoneGap.addHandler(new PhoneGapAvailableHandler() {
-      @Override
-      public void onPhoneGapAvailable(PhoneGapAvailableEvent event) {
-        // PhoneGap is ready!
-      }
-    });
-    phoneGap.addHandler(new PhoneGapTimeoutHandler() {
-      @Override
-      public void onPhoneGapTimeout(PhoneGapTimeoutEvent event) {
-        // PhoneGap won't work; alert the user, crash the app,
-        // whatever...
-      }
-    });
-    phoneGap.initializePhoneGap();
-
-    /*
-     * Set up a text box for the time zone, and a couple of buttons to get the
-     * current time via JSNI and GWT-PhoneGap
+     * Set up the UI and events
      */
     final TextBox timeZoneTextBox= new TextBox();
     RootPanel.get("timeZoneContainer").add(timeZoneTextBox);
@@ -140,10 +131,6 @@ public class GwtSampleProject implements EntryPoint {
       }
     });
 
-    /*
-     * Set up a couple of buttons to get the current position through JSNI and
-     * GWT-PhoneGap
-     */
     final Button getPositionJsniButton= new Button("Get Position through JSNI");
     RootPanel.get("getPositionJsniContainer").add(getPositionJsniButton);
     getPositionJsniButton.addClickHandler(new ClickHandler() {
@@ -193,9 +180,6 @@ public class GwtSampleProject implements EntryPoint {
       }
     });
 
-    /*
-     * Set up alerts through JavaScript (standard) and GWT-Phonegap
-     */
     final Button stdConfirmButton= new Button("Standard JavaScript Confirm");
     RootPanel.get("stdConfirmContainer").add(stdConfirmButton);
     stdConfirmButton.addClickHandler(new ClickHandler() {
@@ -230,6 +214,26 @@ public class GwtSampleProject implements EntryPoint {
     });
 
     /*
+     * Process some events
+     */
+    JsniEvents.setBackButtonCallback(new JsniEventsCallback() {
+      @Override
+      public void onEvent() {
+        // Process Android "Back" button through JSNI
+        Window.alert("Here we'd go back!");
+      }
+    });
+
+    phoneGap.getEvent().getSearchButton()
+      .addSearchButtonHandler(new SearchButtonPressedHandler() {
+        @Override
+        public void onSearchButtonPressed(SearchButtonPressedEvent event) {
+          // Process Android's "search" button through PhoneGap
+          Window.alert("Here we'd do a search!");
+        }
+      });
+
+    /*
      * Set up vibration and beep alerts
      */
     final Button jsniVibrateButton= new Button("Beep and vibrate through JSNI");
@@ -262,24 +266,5 @@ public class GwtSampleProject implements EntryPoint {
 
     DOM.getElementById("maillink").setAttribute("href",
       "mailto:someone@server.com?subject=An email!&body=Some email text...");
-
-    /*
-     * Set handlers for the Android "Back" button (through JSNI) and for the
-     * "Search" button (through GWT-Phonegap)
-     */
-    JsniEvents.setBackButtonCallback(new JsniEventsCallback() {
-      @Override
-      public void onEvent() {
-        Window.alert("Here we'd go back!");
-      }
-    });
-
-    phoneGap.getEvent().getSearchButton()
-      .addSearchButtonHandler(new SearchButtonPressedHandler() {
-        @Override
-        public void onSearchButtonPressed(SearchButtonPressedEvent event) {
-          Window.alert("Here we'd do a search!");
-        }
-      });
   }
 }
