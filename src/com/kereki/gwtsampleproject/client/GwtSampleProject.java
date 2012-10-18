@@ -37,8 +37,32 @@ public class GwtSampleProject implements EntryPoint {
   // Set up PhoneGap
   private final PhoneGap phoneGap= GWT.create(PhoneGap.class);
 
+  static final boolean useGwtPhoneGap= false; // false implies using JSNI only
+
   @Override
   public void onModuleLoad() {
+    if (!GWT.getHostPageBaseURL().startsWith("file://") || useGwtPhoneGap) {
+      onModuleLoadGwtPhoneGap();
+    } else {
+      onModuleLoadJsni(new JsniEventsCallback() {
+        @Override
+        public void onEvent() {
+          finishOnLoad();
+        }
+      });
+    }
+  }
+
+  public native void onModuleLoadJsni(JsniEventsCallback callback) /*-{
+    $doc
+        .addEventListener(
+            "deviceready",
+            function() {
+              $entry(callback.@com.kereki.gwtsampleproject.client.JsniEventsCallback::onEvent()());
+            }, false);
+  }-*/;
+
+  public void onModuleLoadGwtPhoneGap() {
     /*
      * Configure PhoneGap
      */
@@ -63,7 +87,7 @@ public class GwtSampleProject implements EntryPoint {
   /*
    * PhoneGap is ready; finish setting everything up
    */
-  void finishOnLoad() {
+  public void finishOnLoad() {
     /*
      * Adjust the RPC service if running on the smartphone
      */
@@ -155,30 +179,34 @@ public class GwtSampleProject implements EntryPoint {
 
     final Button getPositionGpButton= new Button("Get Position through GWT-Phonegap");
     RootPanel.get("getPositionGpContainer").add(getPositionGpButton);
-    getPositionGpButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        GeolocationOptions options= new GeolocationOptions();
-        options.setEnableHighAccuracy(true);
-        options.setMaximumAge(30000);
-        options.setTimeout(10000);
+    if (useGwtPhoneGap) {
+      getPositionGpButton.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          GeolocationOptions options= new GeolocationOptions();
+          options.setEnableHighAccuracy(true);
+          options.setMaximumAge(30000);
+          options.setTimeout(10000);
 
-        phoneGap.getGeolocation().getCurrentPosition(new GeolocationCallback() {
-          @Override
-          public void onSuccess(Position position) {
-            Window.alert("Through GWT-Phonegap, you are at coordinates "
-              + position.getCoordinates().getLatitude() + ","
-              + position.getCoordinates().getLongitude() + " +/- "
-              + position.getCoordinates().getAccuracy() + " meters.");
-          }
+          phoneGap.getGeolocation().getCurrentPosition(new GeolocationCallback() {
+            @Override
+            public void onSuccess(Position position) {
+              Window.alert("Through GWT-Phonegap, you are at coordinates "
+                + position.getCoordinates().getLatitude() + ","
+                + position.getCoordinates().getLongitude() + " +/- "
+                + position.getCoordinates().getAccuracy() + " meters.");
+            }
 
-          @Override
-          public void onFailure(PositionError error) {
-            Window.alert("Failure... " + error.getMessage());
-          }
-        }, options);
-      }
-    });
+            @Override
+            public void onFailure(PositionError error) {
+              Window.alert("Failure... " + error.getMessage());
+            }
+          }, options);
+        }
+      });
+    } else {
+      getPositionGpButton.setEnabled(false);
+    }
 
     final Button stdConfirmButton= new Button("Standard JavaScript Confirm");
     RootPanel.get("stdConfirmContainer").add(stdConfirmButton);
@@ -195,23 +223,27 @@ public class GwtSampleProject implements EntryPoint {
 
     final Button gpConfirmButton= new Button("GWT-Phonegap Confirm");
     RootPanel.get("gpConfirmContainer").add(gpConfirmButton);
-    gpConfirmButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        final String[] buttonsArray= new String[]{"Yeah", "Nope"};
-        phoneGap.getNotification().confirm("Are you confirming this?",
-          new ConfirmCallback() {
-            @Override
-            public void onConfirm(int button) {
-              if (button == 1) {
-                Window.alert("You confirmed.");
-              } else {
-                Window.alert("You didn't confirm.");
+    if (useGwtPhoneGap) {
+      gpConfirmButton.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          final String[] buttonsArray= new String[]{"Yeah", "Nope"};
+          phoneGap.getNotification().confirm("Are you confirming this?",
+            new ConfirmCallback() {
+              @Override
+              public void onConfirm(int button) {
+                if (button == 1) {
+                  Window.alert("You confirmed.");
+                } else {
+                  Window.alert("You didn't confirm.");
+                }
               }
-            }
-          }, "gwt-phonegap", buttonsArray);
-      }
-    });
+            }, "gwt-phonegap", buttonsArray);
+        }
+      });
+    } else {
+      gpConfirmButton.setEnabled(false);
+    }
 
     /*
      * Process some events
@@ -224,14 +256,16 @@ public class GwtSampleProject implements EntryPoint {
       }
     });
 
-    phoneGap.getEvent().getSearchButton()
-      .addSearchButtonHandler(new SearchButtonPressedHandler() {
-        @Override
-        public void onSearchButtonPressed(SearchButtonPressedEvent event) {
-          // Process Android's "search" button through PhoneGap
-          Window.alert("Here we'd do a search!");
-        }
-      });
+    if (useGwtPhoneGap) {
+      phoneGap.getEvent().getSearchButton()
+        .addSearchButtonHandler(new SearchButtonPressedHandler() {
+          @Override
+          public void onSearchButtonPressed(SearchButtonPressedEvent event) {
+            // Process Android's "search" button through PhoneGap
+            Window.alert("Here we'd do a search!");
+          }
+        });
+    }
 
     /*
      * Set up vibration and beep alerts
@@ -247,14 +281,18 @@ public class GwtSampleProject implements EntryPoint {
     });
 
     final Button gpVibrateButton= new Button("Beep and vibrate through GWT-Phonegap");
-    RootPanel.get("gpWarningContainer").add(gpVibrateButton);
-    gpVibrateButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        phoneGap.getNotification().beep(1);
-        phoneGap.getNotification().vibrate(2209);
-      }
-    });
+    if (useGwtPhoneGap) {
+      RootPanel.get("gpWarningContainer").add(gpVibrateButton);
+      gpVibrateButton.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          phoneGap.getNotification().beep(1);
+          phoneGap.getNotification().vibrate(2209);
+        }
+      });
+    } else {
+      gpVibrateButton.setEnabled(false);
+    }
 
     /*
      * Set up the phone, SMS, and e-Mail links
