@@ -18,4 +18,23 @@ public class JsniNotification {
       navigator.notification.vibrate(duration);
     }
   }-*/;
+
+  static native void confirm(
+    String message,
+    JsniConfirmCallback callback,
+    String title,
+    String buttonLabels)
+  /*-{
+    if (typeof navigator.notification === "undefined") {
+      var result= confirm(message);
+      $entry(callback.@com.kereki.gwtsampleproject.client.JsniConfirmCallback::onConfirm(Z)(result));
+    } else {
+      navigator.notification
+          .confirm(
+              message,
+              function(result) {
+                $entry(callback.@com.kereki.gwtsampleproject.client.JsniConfirmCallback::onConfirm(Z)(result==2));
+              }, title, buttonLabels);
+    }
+  }-*/;
 }

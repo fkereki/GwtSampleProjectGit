@@ -14,3 +14,4 @@ try {
 }
 
 echo $callback."({time:'".$time."'})";
+?>

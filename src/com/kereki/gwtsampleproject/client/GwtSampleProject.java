@@ -37,7 +37,8 @@ public class GwtSampleProject implements EntryPoint {
   // Set up PhoneGap
   private final PhoneGap phoneGap= GWT.create(PhoneGap.class);
 
-  static final boolean useGwtPhoneGap= false; // false implies using JSNI only
+  static final boolean useGwtPhoneGap= true; // false implies using JSNI only
+
 
   @Override
   public void onModuleLoad() {
@@ -53,6 +54,7 @@ public class GwtSampleProject implements EntryPoint {
     }
   }
 
+
   public native void onModuleLoadJsni(JsniEventsCallback callback) /*-{
     $doc
         .addEventListener(
@@ -61,6 +63,7 @@ public class GwtSampleProject implements EntryPoint {
               $entry(callback.@com.kereki.gwtsampleproject.client.JsniEventsCallback::onEvent()());
             }, false);
   }-*/;
+
 
   public void onModuleLoadGwtPhoneGap() {
     /*
@@ -208,16 +211,47 @@ public class GwtSampleProject implements EntryPoint {
       getPositionGpButton.setEnabled(false);
     }
 
-    final Button stdConfirmButton= new Button("Standard JavaScript Confirm");
+    /*
+     * Set up vibration and beep alerts
+     */
+    final Button jsniVibrateButton= new Button("Beep through JSNI");
+    RootPanel.get("jsniBeepContainer").add(jsniVibrateButton);
+    jsniVibrateButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        JsniNotification.beep(1);
+        JsniNotification.vibrate(2209);
+      }
+    });
+
+    final Button gpVibrateButton= new Button("Vibrate through GWT-Phonegap");
+    RootPanel.get("gpVibrateContainer").add(gpVibrateButton);
+    if (useGwtPhoneGap) {
+      gpVibrateButton.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          phoneGap.getNotification().beep(1);
+          phoneGap.getNotification().vibrate(2209);
+        }
+      });
+    } else {
+      gpVibrateButton.setEnabled(false);
+    }
+
+    /*
+     * Confirm something through JSNI and GWT-Phonegap
+     */
+    final Button stdConfirmButton= new Button("JSNI PhoneGap Confirm");
     RootPanel.get("stdConfirmContainer").add(stdConfirmButton);
     stdConfirmButton.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        if (Window.confirm("Do you confirm this?")) {
-          Window.alert("You confirmed.");
-        } else {
-          Window.alert("You didn't confirm.");
-        }
+        JsniNotification.confirm("Will you confirm this?", new JsniConfirmCallback() {
+          @Override
+          public void onConfirm(boolean confirmed) {
+            Window.alert(confirmed? "OK, confirmed": "No, denied");
+          }
+        }, "Confirm title", "Yep,Nope");
       }
     });
 
@@ -232,11 +266,7 @@ public class GwtSampleProject implements EntryPoint {
             new ConfirmCallback() {
               @Override
               public void onConfirm(int button) {
-                if (button == 1) {
-                  Window.alert("You confirmed.");
-                } else {
-                  Window.alert("You didn't confirm.");
-                }
+                Window.alert((button == 1)? "OK, confirmed": "No, denied");
               }
             }, "gwt-phonegap", buttonsArray);
         }
@@ -265,33 +295,6 @@ public class GwtSampleProject implements EntryPoint {
             Window.alert("Here we'd do a search!");
           }
         });
-    }
-
-    /*
-     * Set up vibration and beep alerts
-     */
-    final Button jsniVibrateButton= new Button("Beep and vibrate through JSNI");
-    RootPanel.get("jsniWarningContainer").add(jsniVibrateButton);
-    jsniVibrateButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        JsniNotification.beep(1);
-        JsniNotification.vibrate(2209);
-      }
-    });
-
-    final Button gpVibrateButton= new Button("Beep and vibrate through GWT-Phonegap");
-    if (useGwtPhoneGap) {
-      RootPanel.get("gpWarningContainer").add(gpVibrateButton);
-      gpVibrateButton.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          phoneGap.getNotification().beep(1);
-          phoneGap.getNotification().vibrate(2209);
-        }
-      });
-    } else {
-      gpVibrateButton.setEnabled(false);
     }
 
     /*
