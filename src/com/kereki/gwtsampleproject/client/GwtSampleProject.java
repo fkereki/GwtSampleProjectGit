@@ -261,14 +261,13 @@ public class GwtSampleProject implements EntryPoint {
       gpConfirmButton.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
-          final String[] buttonsArray= new String[]{"Yeah", "Nope"};
           phoneGap.getNotification().confirm("Are you confirming this?",
             new ConfirmCallback() {
               @Override
               public void onConfirm(int button) {
                 Window.alert((button == 1)? "OK, confirmed": "No, denied");
               }
-            }, "gwt-phonegap", buttonsArray);
+            }, "gwt-phonegap", new String[]{"Yeah", "Nope"});
         }
       });
     } else {
