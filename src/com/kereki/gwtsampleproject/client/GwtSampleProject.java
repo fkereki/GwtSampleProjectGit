@@ -142,19 +142,18 @@ public class GwtSampleProject implements EntryPoint {
       @Override
       public void onClick(ClickEvent event) {
         final JsonpRequestBuilder jsonprb= new JsonpRequestBuilder();
-        jsonprb.requestObject(
-          MY_HOST + ":80/getjsontime.php?zone=" + timeZoneTextBox.getValue(),
-          new AsyncCallback<JsonTime>() {
-            @Override
-            public void onSuccess(JsonTime result) {
-              Window.alert("Time by JSONP is " + result.getTime());
-            }
+        jsonprb.requestObject(MY_HOST + ":80/getjsontime.php?unga=bunga&zone="
+          + timeZoneTextBox.getValue(), new AsyncCallback<JsonTime>() {
+          @Override
+          public void onSuccess(JsonTime result) {
+            Window.alert("Time by JSONP is " + result.getTime());
+          }
 
-            @Override
-            public void onFailure(final Throwable caught) {
-              Window.alert("Failure ... " + caught.getMessage());
-            }
-          });
+          @Override
+          public void onFailure(final Throwable caught) {
+            Window.alert("Failure ... " + caught.getMessage());
+          }
+        });
       }
     });
 
